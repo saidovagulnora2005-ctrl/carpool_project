@@ -13,4 +13,5 @@ urlpatterns = [
     path('companionrequests/',companion_request_list_view,name='companion_request_list'),
     path('companionrequests/create/',companion_request_create_view,name='companion_request_create'),
     path('editcompanionrequests/<int:pk>/',companion_request_update_view,name='companion_request_update'),
+    path('deletecompanionrequests/<int:pk>/',companion_request_delete_view,name='companion_request_delete'),
 ]

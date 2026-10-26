@@ -145,3 +145,10 @@ def companion_request_update_view(request, pk):
     return render(request, 'companion_request_update.html')
 
 
+@login_required
+def companion_request_delete_view(request, pk):
+    companion_request = get_object_or_404(CompanionRequest,pk=pk,user=request.user)
+    if request.method == 'POST':
+        companion_request.delete()
+        return redirect('companion_request_list')
+    return render(request, 'companion_request_delete.html', {'companion_request': companion_request})
