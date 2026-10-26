@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Удалить поездку | Carpool{% endblock %}
+{% block content %}
+
+<section class="auth-section">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <h1>Удалить поездку?</h1>
+            <p>
+                {{ trip.start_location }} — {{ trip.end_location }}
+            </p>
+            <p>Это действие нельзя отменить</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            <button type="submit" class="btn btn-danger btn-block">
+                Да, удалить
+            </button>
+
+            <a href="{% url 'trip_list' %}" class="btn btn-secondary btn-block">
+                Отмена
+            </a>
+        </form>
+
+    </div>
+</section>
+{% endblock %}

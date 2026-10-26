@@ -1,0 +1,109 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | Carpool{% endblock %}
+
+{% block content %}
+
+<section class="auth-section">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <h1>{{ title }}</h1>
+            <p>Заполни данные своей поездки.</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="start_location">Откуда</label>
+                <input
+                    type="text"
+                    id="start_location"
+                    name="start_location"
+                    class="form-control"
+                    value="{{ form.start_location.value|default_if_none:'' }}"
+                    placeholder="Начальная точка"
+                    required
+                >
+                {% for error in form.start_location.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="end_location">Куда</label>
+                <input
+                    type="text"
+                    id="end_location"
+                    name="end_location"
+                    class="form-control"
+                    value="{{ form.end_location.value|default_if_none:'' }}"
+                    placeholder="Конечная точка"
+                    required
+                >
+                {% for error in form.end_location.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="date">Дата и время</label>
+                <input
+                    type="datetime-local"
+                    id="date"
+                    name="date"
+                    class="form-control"
+                    value="{{ form.date.value|date:'Y-m-d\TH:i' }}"
+                    required
+                >
+                {% for error in form.date.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="seats_available">Количество свободных мест</label>
+                <input
+                    type="number"
+                    id="seats_available"
+                    name="seats_available"
+                    class="form-control"
+                    value="{{ form.seats_available.value|default_if_none:'' }}"
+                    min="1"
+                    placeholder="Например, 3"
+                    required
+                >
+                {% for error in form.seats_available.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="description">Описание поездки</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Дополнительная информация"
+                >{{ form.description.value|default_if_none:'' }}</textarea>
+                {% for error in form.description.errors %}
+                    <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-block">
+                Создать поездку
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{% url 'trip_list' %}">Назад к поездкам</a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

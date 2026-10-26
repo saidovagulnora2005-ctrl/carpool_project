@@ -1,12 +1,23 @@
 from django.http import HttpResponse
 from .helpers import send_confirmation_email
-from django.shortcuts import render, redirect
-from .models import CustomUser, EmailConfirmation
+from django.shortcuts import render, redirect,get_object_or_404
+from .models import CustomUser, EmailConfirmation,Trip, CompanionRequest
 from django.contrib.auth import login,authenticate
+from django.contrib.auth.decorators import login_required
+from .forms import TripForm, CompanionRequestForm
 
 
 def home_view(request):
-    return render(request, 'home.html')
+    trips = Trip.objects.filter(seats_available__gt=0).order_by('date')
+
+    if request.GET.get('start_location'):
+        trips = trips.filter(start_location__icontains=request.GET.get('start_location'))
+    if request.GET.get('end_location'):
+        trips = trips.filter(end_location__icontains=request.GET.get('end_location'))
+    if request.GET.get('date'):
+        trips = trips.filter(date__date=request.GET.get('date'))
+
+    return render(request, 'home.html', {'trips': trips})
 
 
 def register_view(request):
@@ -52,4 +63,57 @@ def confirm_email_view(request,token):
         user.is_active = True
         user.save()
         return redirect('login')
-    return HttpResponse("Код подтверждения неправильный или срок действии истек!")
+    return HttpResponse("Код подтверждения неправильный!")
+
+
+def trip_list_view(request):
+    trips = Trip.objects.all()
+
+    start_location = request.GET.get('start_location', '')
+    end_location = request.GET.get('end_location', '')
+    trip_date = request.GET.get('date', '')
+
+    if start_location:
+        trips = trips.filter(start_location__icontains=start_location)
+    if end_location:
+        trips = trips.filter(end_location__icontains=end_location)
+    if trip_date:
+        trips = trips.filter(date__date=trip_date)
+
+    return render(request, 'trip_list.html', {'trips': trips,'start_location': start_location,'end_location': end_location,'trip_date': trip_date})
+
+
+@login_required
+def trip_create_view(request):
+    if request.method == 'POST':
+        form = TripForm(request.POST)
+        if form.is_valid():
+            trip = form.save(commit=False)
+            trip.user = request.user
+            trip.save()
+            return redirect('trip_list')
+    else:
+        form = TripForm()
+    return render(request, 'trip_create.html')
+
+
+@login_required
+def trip_update_view(request, pk):
+    trip = get_object_or_404(Trip, id=pk, user=request.user)
+    if request.method == 'POST':
+        form = TripForm(request.POST, instance=trip)
+        if form.is_valid():
+            form.save()
+            return redirect('trip_list')
+    else:
+        form = TripForm(instance=trip)
+    return render(request, 'trip_update.html')
+
+
+@login_required
+def trip_delete_view(request, pk):
+    trip = get_object_or_404(Trip, id=pk, user=request.user)
+    if request.method == 'POST':
+        trip.delete()
+        return redirect('trip_list')
+    return render(request, 'trip_delete.html', {'trip': trip})
