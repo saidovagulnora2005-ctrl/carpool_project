@@ -133,3 +133,15 @@ def companion_request_create_view(request):
         companion_request.save()
         return redirect('companion_request_list')
     return render(request, 'companion_request_create.html')
+
+
+@login_required
+def companion_request_update_view(request, pk):
+    companion_request = get_object_or_404(CompanionRequest,pk=pk,user=request.user)
+    form = CompanionRequestForm(request.POST or None,instance=companion_request)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('companion_request_list')
+    return render(request, 'companion_request_update.html')
+
+
