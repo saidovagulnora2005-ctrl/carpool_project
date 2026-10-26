@@ -117,3 +117,19 @@ def trip_delete_view(request, pk):
         trip.delete()
         return redirect('trip_list')
     return render(request, 'trip_delete.html', {'trip': trip})
+
+
+def companion_request_list_view(request):
+    requests = CompanionRequest.objects.select_related('user').order_by('date')
+    return render(request, 'companion_request_list.html', {'requests': requests,})
+
+
+@login_required
+def companion_request_create_view(request):
+    form = CompanionRequestForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        companion_request = form.save(commit=False)
+        companion_request.user = request.user
+        companion_request.save()
+        return redirect('companion_request_list')
+    return render(request, 'companion_request_create.html')

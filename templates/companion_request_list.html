@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Запросы попутчиков | SG Carpool{% endblock %}
+{% block content %}
+<section class="container section">
+
+    <div class="section-header">
+        <div>
+            <h2>Запросы на попутчика</h2>
+            <p class="section-description">
+                Найди человека, который едет в ту же сторону.
+            </p>
+        </div>
+
+        {% if user.is_authenticated %}
+            <a
+                href="{% url 'companion_request_create' %}"
+                class="btn"
+            >
+                + Создать запрос
+            </a>
+        {% endif %}
+    </div>
+
+    {% if requests %}
+        <div class="request-grid">
+            {% for item in requests %}
+                <article class="request-card">
+
+                    <div class="trip-route">
+                        <div class="route-point">
+                            <span class="route-dot"></span>
+                            <div>
+                                <div class="route-label">Откуда</div>
+                                <div class="route-location">
+                                    {{ item.start_location }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="route-line"></div>
+
+                        <div class="route-point">
+                            <span class="route-dot end"></span>
+                            <div>
+                                <div class="route-label">Куда</div>
+                                <div class="route-location">
+                                    {{ item.end_location }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trip-info">
+                        <span>{{ item.date|date:"d.m.Y H:i" }}</span>
+                    </div>
+
+                    {% if item.description %}
+                        <p class="trip-description">
+                            {{ item.description }}
+                        </p>
+                    {% endif %}
+
+                    <div class="trip-footer">
+                        <span class="trip-author">
+                            {{ item.user }}
+                        </span>
+
+                        {% if user.is_authenticated and item.user_id == user.id %}
+                            <a
+                                href="{% url 'companion_request_update' item.pk %}"
+                                class="btn btn-secondary"
+                            >Изменить</a>
+
+                            <a
+                                href="{% url 'companion_request_delete' item.pk %}"
+                                class="btn btn-danger"
+                            >Удалить</a>
+                        {% endif %}
+                    </div>
+
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>Пока нет запросов</h3>
+            <p>Будь первым, кто опубликует свой маршрут!</p>
+        </div>
+    {% endif %}
+
+</section>
+{% endblock %}
