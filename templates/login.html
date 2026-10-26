@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Вход | SG Carpool{% endblock %}
+{% block content %}
+
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>С возвращением!</h1>
+            <p>Войдите в аккаунт, чтобы продолжить.</p>
+        </div>
+        {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+        {% endif %}
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Электронная почта</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="example@gmail.com"
+                    value="{{ request.POST.email }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password1">Пароль</label>
+                <input type="password" id="password1" name="password1" class="form-control" placeholder="Введите свой пароль" required>
+            </div>
+
+            <button type="submit" class="btn btn-block">Войти</button>
+        </form>
+        <div class="auth-footer"> Нет аккаунта?
+            <a href="{% url 'register_view' %}">Зарегистрироваться</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
